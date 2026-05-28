@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Robot Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0f172a; color: #e2e8f0; font-family: sans-serif; font-size: 14px; }
+header { background: #1e293b; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
+header h1 { font-size: 16px; font-weight: 600; }
+#status-dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block; margin-right: 6px; transition: background 0.3s; }
+#status-dot.ok { background: #22c55e; }
+#status-text { font-size: 12px; color: #94a3b8; }
+.mode-tabs { display: flex; background: #0f172a; padding: 10px; border-bottom: 1px solid #334155; gap: 6px; }
+.mode-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b; transition: all 0.2s; }
+.mode-tab.active { background: #1d4ed8; color: white; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+.card { background: #1e293b; border-radius: 10px; padding: 12px; border: 1px solid #334155; }
+.card h3 { font-size: 11px; color: #64748b; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.full { grid-column: 1 / -1; }
+
+
+canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+#map-wrap { width: 100%; height: 280px; background: #0f172a; border-radius: 8px; overflow: hidden; position: relative; }
+#map-wrap2 { width: 100%; height: 260px; background: #0f172a; border-radius: 8px; overflow: hidden; position: relative; }
+.wp-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.wp-btn { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+.wp-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+.wp-btn.active { background: #1e3a5f; border-color: #3b82f6; }
+.map-ph { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #475569; font-size: 13px; }
+#cam-wrap { width: 100%; height: 260px; background: #0f172a; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+#cam-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat { background: #0f172a; border-radius: 8px; padding: 10px; text-align: center; }
+.stat-val { font-size: 20px; font-weight: 700; color: #38bdf8; }
+.stat-lbl { font-size: 10px; color: #64748b; margin-top: 2px; }
+#obs-alert { display: none; background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; text-align: center; }
+#obs-alert.show { display: block; }
+.joy-wrap { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+#joystick { width: 130px; height: 130px; background: #0f172a; border-radius: 50%; border: 2px solid #334155; position: relative; touch-action: none; cursor: pointer; flex-shrink: 0; }
+#joy-knob { width: 46px; height: 46px; background: #38bdf8; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+.joy-btns { display: flex; flex-direction: column; gap: 8px; }
+.btn { padding: 9px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity 0.15s; }
+.btn:active { opacity: 0.75; }
+.btn-red { background: #ef4444; color: white; }
+.btn-blue { background: #3b82f6; color: white; }
+.btn-gray { background: #334155; color: #e2e8f0; }
+.btn-green { background: #16a34a; color: white; }
+.btn-lg { font-size: 15px; padding: 13px 20px; }
+
+
+
+
+
+.inp { flex: 1; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.inp:focus { outline: none; border-color: #38bdf8; }
+.hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.hist-table th { background: #0f172a; color: #64748b; padding: 8px 6px; text-align: left; border-bottom: 1px solid #334155; white-space: nowrap; }
+.hist-table td { padding: 7px 6px; border-bottom: 1px solid #1e293b; color: #cbd5e1; white-space: nowrap; }
+.badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.b-ok { background: #14532d; color: #4ade80; }
+.b-fail { background: #450a0a; color: #f87171; }
+.page { display: none; }
+.page.active { display: block; }
+@media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Robot Dashboard</h1>
+  <div><span id="status-dot"></span><span id="status-text">Đang kết nối...</span></div>
+</header>
+<div class="mode-tabs">
+  <div class="mode-tab active" onclick="switchPage('mapping')" id="tab-mapping">Mapping</div>
+  <div class="mode-tab" onclick="switchPage('nav')" id="tab-nav">Navigation</div>
+  <div class="mode-tab" onclick="switchPage('history')" id="tab-history">Lich su</div>
+  <div class="mode-tab" onclick="switchPage('ai')" id="tab-ai">AI</div>
+</div>
+
+<!-- CONTROL PANEL -->
+<div style="background:#1e293b;padding:10px 12px;border-bottom:1px solid #334155;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:12px;color:#64748b">Chế độ:</span>
+  <button onclick="startSlam()" id="btn-slam-start" style="background:#16a34a;color:white;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">▶ Bắt đầu SLAM</button>
+  <button onclick="stopSlam()" id="btn-slam-stop" style="background:#ef4444;color:white;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">■ Dừng SLAM</button>
+  <div style="width:1px;height:24px;background:#334155"></div>
+  <button onclick="startNav2()" id="btn-nav-start" style="background:#1d4ed8;color:white;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">▶ Bắt đầu Nav2</button>
+  <button onclick="stopNav2()" id="btn-nav-stop" style="background:#ef4444;color:white;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">■ Dừng Nav2</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+    <div id="mode-indicator" style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+    <span id="mode-status" style="font-size:12px;color:#94a3b8">Chờ...</span>
+  </div>
+</div>
+<!-- MAPPING -->
+<div class="page active" id="page-mapping">
+  <div class="grid">
+    <div class="card full">
+      <h3>Ban do dang ve</h3>
+      <div id="map-wrap" style="width:100%;height:280px;background:#0f172a;border-radius:8px;overflow:hidden;position:relative;">
+        <canvas id="map-canvas"></canvas>
+        <div class="map-ph" id="map-ph">Cho du lieu map...</div>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Dieu khien tay</h3>
+      <div id="obs-alert">Chuong ngai vat gan! (&lt;40cm)</div>
+      <div class="joy-wrap">
+        <div>
+          <div id="joystick"><div id="joy-knob"></div></div>
+          <div style="text-align:center;margin-top:6px;font-size:11px;color:#64748b">Keo de di chuyen</div>
+        </div>
+        <div class="joy-btns">
+          <button class="btn btn-red btn-lg" onclick="eStop()">DUNG KHAN CAP</button>
+          <button class="btn btn-green" onclick="saveMap()">Luu Map</button>
+          <div style="display:flex;gap:8px;margin-top:0">
+            <input class="inp" id="map-name-input" placeholder="Ten file map" value="my_map"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Trang thai</h3>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val" id="m-speed">0.00</div><div class="stat-lbl">Toc do (m/s)</div></div>
+        <div class="stat"><div class="stat-val" id="m-dist">0.00</div><div class="stat-lbl">Quang duong (m)</div></div>
+        <div class="stat"><div class="stat-val" id="m-x">0.00</div><div class="stat-lbl">X (m)</div></div>
+        <div class="stat"><div class="stat-val" id="m-y">0.00</div><div class="stat-lbl">Y (m)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="page" id="page-nav">
+  <div class="grid">
+    <div class="card full">
+      <h3>Ban do + Vi tri robot</h3>
+      <div id="map-wrap2" style="width:100%;height:260px;background:#0f172a;border-radius:8px;overflow:hidden;position:relative;">
+        <canvas id="map-canvas2"></canvas>
+        <div class="map-ph" id="map-ph2">Cho map...</div>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Camera</h3>
+      <div id="cam-wrap">
+        <img id="cam-img" alt="camera"/>
+        <span id="cam-ph" style="color:#475569;font-size:13px">Chua co tin hieu</span>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Waypoint</h3>
+      <div id="obs-alert2" style="display:none;background:#7f1d1d;border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;margin-bottom:8px;font-size:12px;text-align:center">Chuong ngai vat gan!</div>
+      <div class="wp-list" id="wp-list">
+        <button class="btn btn-blue" onclick="setInitialPose()" style="margin-bottom:8px;width:100%">📍 Set vị trí ban đầu</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input class="inp" id="wp-name" placeholder="Ten diem moi"/>
+        <button class="btn btn-blue" onclick="saveCurrentAsWP()">Luu vi tri</button>
+        <button class="btn btn-red" onclick="cancelNav()">Huy dich</button>
+        <button class="btn btn-red" onclick="eStop()">DUNG</button>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Trang thai</h3>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val" id="n-speed">0.00</div><div class="stat-lbl">Toc do (m/s)</div></div>
+        <div class="stat"><div class="stat-val" id="n-dist">0.00</div><div class="stat-lbl">Quang duong (m)</div></div>
+        <div class="stat"><div class="stat-val" id="n-x">0.00</div><div class="stat-lbl">X (m)</div></div>
+        <div class="stat"><div class="stat-val" id="n-y">0.00</div><div class="stat-lbl">Y (m)</div></div>
+      </div>
+    </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="page" id="page-history">
+  <div class="grid">
+    <div class="card full">
+      <h3>Lich su hoat dong</h3>
+      <div style="overflow-x:auto">
+        <table class="hist-table">
+          <thead><tr><th>#</th><th>Thoi gian</th><th>Che do</th><th>Diem den</th><th>Quang duong</th><th>Thoi gian di</th><th>Toc do TB</th><th>Chuong ngai</th><th>Ket qua</th></tr></thead>
+          <tbody id="hist-body"><tr><td colspan="9" style="text-align:center;color:#475569;padding:20px">Chua co du lieu</td></tr></tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;text-align:right">
+        <button class="btn btn-gray" onclick="clearHistory()">Xoa lich su</button>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>He thong</h3>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val" id="sys-time" style="font-size:14px">--:--:--</div><div class="stat-lbl">Thoi gian</div></div>
+        <div class="stat"><div class="stat-val" id="sys-date" style="font-size:14px">--/--/----</div><div class="stat-lbl">Ngay thang</div></div>
+        <div class="stat"><div class="stat-val" id="sys-cpu">--%</div><div class="stat-lbl">CPU Pi</div></div>
+        <div class="stat"><div class="stat-val" id="sys-ram">--%</div><div class="stat-lbl">RAM Pi</div></div>
+        <div class="stat"><div class="stat-val" id="sys-disk">--GB</div><div class="stat-lbl">Disk con lai</div></div>
+        <div class="stat"><div class="stat-val" id="sys-wifi">--</div><div class="stat-lbl">WiFi (dBm)</div></div>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Thong ke hom nay</h3>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val" id="total-trips">0</div><div class="stat-lbl">Tong chuyen</div></div>
+        <div class="stat"><div class="stat-val" id="total-dist">0.00</div><div class="stat-lbl">Tong quang duong (m)</div></div>
+        <div class="stat"><div class="stat-val" id="total-obs">0</div><div class="stat-lbl">Lan gap chuong ngai</div></div>
+        <div class="stat"><div class="stat-val" id="total-time">0</div><div class="stat-lbl">Tong thoi gian (s)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROS_IP = window.location.hostname;
+const ROS_PORT = 9090;
+let ros=null, cmdVelPub=null;
+let nav2Running=false;
+let pos={x:0,y:0}, lastPos=null, totalDist=0;
+let tripStart=null, tripStartPos=null, tripDest='', tripObs=0;
+let jActive=false, jInterval=null, jVx=0, jAz=0;
+let history=JSON.parse(localStorage.getItem('robot_history')||'[]');
+let tripCount=history.length+1;
+let allObs=0, allDist=0, allTime=0;
+
+function connect() {
+  ros=new ROSLIB.Ros({url:`ws://${ROS_IP}:${ROS_PORT}`});
+  ros.on('connection',()=>{
+    document.getElementById('status-dot').classList.add('ok');
+    document.getElementById('status-text').textContent='Da ket noi · '+ROS_IP; initAI(); initTrack(); loadWaypoints(); initEStop();
+    setupTopics();
+  });
+  ros.on('error',()=>{ document.getElementById('status-dot').classList.remove('ok'); document.getElementById('status-text').textContent='Loi ket noi'; setTimeout(connect,3000); });
+  ros.on('close',()=>{ document.getElementById('status-dot').classList.remove('ok'); document.getElementById('status-text').textContent='Mat ket noi...'; setTimeout(connect,3000); });
+}
+
+function setupTopics() {
+  cmdVelPub=new ROSLIB.Topic({ros,name:'/cmd_vel',messageType:'geometry_msgs/Twist'});
+
+  // Lay vi tri trong map frame tu /slam_toolbox/pose hoac /amcl_pose
+  // Subscribe /odometry/filtered cho SLAM
+  new ROSLIB.Topic({ros,name:'/odometry/filtered',messageType:'nav_msgs/Odometry',throttle_rate:200}).subscribe(msg=>{
+    if(nav2Running) return; // Khi nav2 dung amcl_pose
+    const x=msg.pose.pose.position.x, y=msg.pose.pose.position.y;
+    const vx=msg.twist.twist.linear.x;
+    pos={x,y};
+    if(lastPos){ const d=Math.sqrt(Math.pow(x-lastPos.x,2)+Math.pow(y-lastPos.y,2)); if(d<0.5) totalDist+=d; }
+    lastPos={x,y};
+    const dist=totalDist.toFixed(2);
+    ['m','n'].forEach(p=>{ document.getElementById(p+'-speed').textContent=Math.abs(vx).toFixed(2); document.getElementById(p+'-dist').textContent=dist; document.getElementById(p+'-x').textContent=x.toFixed(2); document.getElementById(p+'-y').textContent=y.toFixed(2); });
+  });
+  // Subscribe /amcl_pose cho Nav2
+  new ROSLIB.Topic({ros,name:'/amcl_pose',messageType:'geometry_msgs/PoseWithCovarianceStamped',throttle_rate:200}).subscribe(msg=>{
+    if(!nav2Running) return;
+    const x=msg.pose.pose.position.x, y=msg.pose.pose.position.y;
+    pos={x,y};
+    if(lastPos){ const d=Math.sqrt(Math.pow(x-lastPos.x,2)+Math.pow(y-lastPos.y,2)); if(d<0.5) totalDist+=d; }
+    lastPos={x,y};
+    const dist=totalDist.toFixed(2);
+    ['m','n'].forEach(p=>{ document.getElementById(p+'-dist').textContent=dist; document.getElementById(p+'-x').textContent=x.toFixed(2); document.getElementById(p+'-y').textContent=y.toFixed(2); });
+    // Ve lai map voi vi tri moi
+    if(mapData) drawMap('map-canvas2', mapData);
+  });
+
+
+  new ROSLIB.Topic({ros,name:'/map',messageType:'nav_msgs/OccupancyGrid',throttle_rate:2000}).subscribe(msg=>{
+    mapData=msg;
+    if(document.getElementById('map-ph')) document.getElementById('map-ph').style.display='none';
+    if(document.getElementById('map-ph2')) document.getElementById('map-ph2').style.display='none';
+    if(!nav2Running){ drawMap('map-canvas',msg); } else { drawMap('map-canvas2',msg); }
+  });
+  new ROSLIB.Topic({ros,name:'/scan',messageType:'sensor_msgs/LaserScan',throttle_rate:500}).subscribe(msg=>{
+    const valid=msg.ranges.filter(r=>r>msg.range_min&&r<msg.range_max);
+    const minR=valid.length?Math.min(...valid):999;
+    const show=minR<0.4;
+    document.getElementById('obs-alert').classList.toggle('show',show);
+    const oa2=document.getElementById('obs-alert2'); if(oa2) oa2.style.display=show?'block':'none';
+    if(show) tripObs++;
+  });
+
+  new ROSLIB.Topic({ros,name:'/image_raw/compressed',messageType:'sensor_msgs/CompressedImage',throttle_rate:300}).subscribe(msg=>{
+    const img=document.getElementById('cam-img');
+    console.log('format:',msg.format,'data len:',msg.data.length); img.src='data:image/'+msg.format+';base64,'+msg.data;
+    img.style.display='block';
+    document.getElementById('cam-ph').style.display='none';
+  });
+}
+
+
+
+const joy=document.getElementById('joystick'), knob=document.getElementById('joy-knob'), R=42;
+function getJoyDelta(e){ const rect=joy.getBoundingClientRect(); const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2; const t=e.touches?e.touches[0]:e; let dx=t.clientX-cx, dy=t.clientY-cy; const d=Math.sqrt(dx*dx+dy*dy); if(d>R){dx=dx/d*R;dy=dy/d*R;} return{dx,dy}; }
+joy.addEventListener('touchstart',e=>{e.preventDefault();startJoy();},{passive:false});
+joy.addEventListener('touchmove',e=>{e.preventDefault();moveJoy(getJoyDelta(e));},{passive:false});
+joy.addEventListener('touchend',e=>{e.preventDefault();stopJoy();},{passive:false});
+joy.addEventListener('mousedown',()=>startJoy());
+document.addEventListener('mousemove',e=>{if(jActive)moveJoy(getJoyDelta(e));});
+document.addEventListener('mouseup',()=>{if(jActive)stopJoy();});
+function startJoy(){ if(estopPub) estopPub.publish(new ROSLIB.Message({data:false})); jActive=true; if(!tripStart){tripStart=Date.now();tripStartPos={...pos};tripDest='Thu cong';tripObs=0;} jInterval=setInterval(()=>sendVel(jVx,jAz),100); }
+function moveJoy({dx,dy}){ knob.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`; jVx=-dy/R*0.2; jAz=-dx/R*1.0; }
+function stopJoy(){ jActive=false; knob.style.transform='translate(-50%,-50%)'; jVx=0;jAz=0; clearInterval(jInterval); sendVel(0,0); if(tripStart)saveTrip('Hoan thanh'); }
+function sendVel(vx,az){ if(!cmdVelPub)return; cmdVelPub.publish(new ROSLIB.Message({linear:{x:vx,y:0,z:0},angular:{x:0,y:0,z:az}})); }
+
+
+
+
+function saveMap(){
+  const name=document.getElementById('map-name-input').value.trim()||'my_map';
+  apiCall('/map/save?name='+name).then(res=>{
+    if(res&&res.ok) alert('Da luu map: '+name);
+    else alert('Luu map that bai!');
+  });
+}
+
+
+
+
+
+
+
+
+function saveTrip(status='Hoan thanh',ok=true){
+  if(!tripStart)return;
+  const dur=Math.round((Date.now()-tripStart)/1000);
+  const dx=pos.x-(tripStartPos?.x||0), dy=pos.y-(tripStartPos?.y||0);
+  const dist=Math.sqrt(dx*dx+dy*dy).toFixed(2);
+  const avgSpd=dur>0?(dist/dur).toFixed(2):'0.00';
+  const now=new Date().toLocaleTimeString('vi-VN');
+  const mode=document.querySelector('.mode-tab.active')?.textContent?.trim()||'';
+  const entry={id:tripCount++,time:now,mode,dest:tripDest,dist,dur,avgSpd,obs:tripObs,ok};
+  history.unshift(entry);
+  localStorage.setItem('robot_history',JSON.stringify(history.slice(0,100)));
+  allDist+=parseFloat(dist); allObs+=tripObs; allTime+=dur;
+  document.getElementById('total-trips').textContent=history.length;
+  document.getElementById('total-dist').textContent=allDist.toFixed(2);
+  document.getElementById('total-obs').textContent=allObs;
+  document.getElementById('total-time').textContent=allTime;
+  renderHistory();
+  tripStart=null;tripStartPos=null;tripDest='';tripObs=0;
+}
+
+function renderHistory(){
+  const tbody=document.getElementById('hist-body');
+  if(!history.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:#475569;padding:20px">Chua co du lieu</td></tr>';return;}
+  tbody.innerHTML=history.map(e=>`<tr><td>${e.id}</td><td>${e.time}</td><td>${e.mode}</td><td>${e.dest}</td><td>${e.dist} m</td><td>${e.dur} s</td><td>${e.avgSpd} m/s</td><td>${e.obs>0?'! '+e.obs:'OK'}</td><td><span class="badge ${e.ok?'b-ok':'b-fail'}">${e.ok?'OK':'Loi'}</span></td></tr>`).join('');
+}
+
+function clearHistory(){ if(!confirm('Xoa toan bo lich su?'))return; history=[];tripCount=1; localStorage.removeItem('robot_history'); renderHistory(); ['total-trips','total-obs','total-time'].forEach(id=>document.getElementById(id).textContent=0); document.getElementById('total-dist').textContent='0.00'; }
+
+// AI Detection - khoi tao sau khi ROS ket noi
+function initAI(){
+  // AI topics - chi subscribe khi bat dau AI
+  window.aiDetectionSub = null;
+  window.aiObjectsSub = null;
+  // Mac dinh hien camera raw
+  window.aiRawSub = new ROSLIB.Topic({ros, name:'/image_raw/compressed', messageType:'sensor_msgs/CompressedImage', throttle_rate:200});
+  window.aiRawSub.subscribe(msg=>{
+    const img = document.getElementById('ai-cam-img');
+    img.src = 'data:image/jpeg;base64,' + msg.data;
+    img.style.display = 'block';
+    document.getElementById('ai-cam-ph').style.display = 'none';
+  });
+  new ROSLIB.Topic({ros, name:'/detection/objects', messageType:'std_msgs/String'}).subscribe(msg=>{
+    const objs = JSON.parse(msg.data);
+    const el = document.getElementById('ai-objects');
+    if(objs.length === 0){ el.textContent = 'Khong phat hien vat the'; return; }
+    const counts = {};
+    objs.forEach(o=>{ counts[o.name] = (counts[o.name]||0)+1; });
+    el.innerHTML = Object.entries(counts).map(([k,v])=>`<span onclick="startTrack('${k}')" style="display:inline-block;margin:4px;padding:8px 16px;background:#1e3a5f;border-radius:6px;border:2px solid #3b82f6;cursor:pointer;font-weight:600;color:#e2e8f0">${k} x${v}</span>`).join('');
+  });
+}
+// Track publisher
+var trackPub = null;
+function initTrack(){
+  trackPub = new ROSLIB.Topic({ros, name:'/track/target', messageType:'std_msgs/String'});
+}
+function startTrack(name){
+  if(!trackPub) return;
+  trackPub.publish(new ROSLIB.Message({data: name}));
+  document.getElementById('track-status').textContent = '🎯 Dang track: ' + name;
+}
+function stopTrack(){
+  if(!trackPub) return;
+  trackPub.publish(new ROSLIB.Message({data: ''}));
+  document.getElementById('track-status').textContent = '';
+}
+let mapData=null;
+function drawMap(canvasId,msg) {
+  const canvas=document.getElementById(canvasId);
+  if(!canvas) return;
+  const w=msg.info.width, h=msg.info.height;
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  const img=ctx.createImageData(w,h);
+  for(let i=0;i<msg.data.length;i++){
+    const v=msg.data[i]; let r=v===-1?128:v===0?240:30;
+    img.data[i*4]=r; img.data[i*4+1]=r; img.data[i*4+2]=r; img.data[i*4+3]=255;
+  }
+  const res=msg.info.resolution, ox=msg.info.origin.position.x, oy=msg.info.origin.position.y;
+  // Cong thuc chuan ROS: flip Y vi canvas Y nguoc chieu ROS Y
+  // Robot pixel: rx = (robot.x - origin.x) / res
+  //              ry = h - (robot.y - origin.y) / res  (flip Y)
+  const rx=(pos.x-ox)/res;
+  const ry=h-(pos.y-oy)/res;
+  ctx.save();
+  ctx.translate(0,h); ctx.scale(1,-1);
+  ctx.putImageData(img,0,0);
+  ctx.restore();
+  // Ve robot dot sau restore (toa do da flip Y)
+  ctx.beginPath(); ctx.arc(rx,ry,4,0,2*Math.PI); ctx.fillStyle='#ef4444'; ctx.fill();
+  ctx.beginPath(); ctx.arc(rx,ry,7,0,2*Math.PI); ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.5; ctx.stroke();
+}
+async function setInitialPose(){
+  await apiCall('/set_initial_pose');
+  return;
+  // old code below
+  if(false){
+  if(!ros)return alert('Chua ket noi ROS!');
+  const initPub = new ROSLIB.Topic({ros, name:'/initialpose', messageType:'geometry_msgs/PoseWithCovarianceStamped'});
+  initPub.publish(new ROSLIB.Message({
+    header:{frame_id:'map', stamp:{secs:0,nsecs:0}},
+    pose:{
+      pose:{position:{x:pos.x,y:pos.y,z:0}, orientation:{x:0,y:0,z:0,w:1}},
+      covariance:[0.25,0,0,0,0,0, 0,0.25,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0.06853]
+    }
+  }));
+  showToast('Da set vi tri ban dau!', true);
+  }
+}
+function sendWaypoint(name,x,y,yaw,btn){
+  if(estopPub) estopPub.publish(new ROSLIB.Message({data:false}));
+  if(!ros)return alert('Chua ket noi!');
+  document.querySelectorAll('.wp-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  tripStart=Date.now(); tripStartPos={...pos}; tripDest=name; tripObs=0;
+  const goalPub=new ROSLIB.Topic({ros,name:'/goal_pose',messageType:'geometry_msgs/PoseStamped'});
+  goalPub.publish(new ROSLIB.Message({header:{frame_id:'map'},pose:{position:{x,y,z:0},orientation:{x:0,y:0,z:Math.sin(yaw/2),w:Math.cos(yaw/2)}}}));
+}
+function loadWaypoints(){
+  apiCall('/waypoint/list').then(data=>{
+    if(!data||!data.waypoints) return;
+    const list = document.getElementById('wp-list');
+    list.querySelectorAll('.wp-btn').forEach(b=>b.remove());
+    data.waypoints.forEach(wp=>{
+      const btn = document.createElement('button');
+      btn.className = 'wp-btn'; btn.textContent = wp.name;
+      btn.onclick = function(){ sendWaypoint(wp.name, wp.x, wp.y, 0, this); };
+      const del = document.createElement('span');
+      del.textContent = ' ✕'; del.style.cssText = 'color:#ef4444;margin-left:4px;cursor:pointer;';
+      del.onclick = function(e){ e.stopPropagation(); deleteWaypoint(wp.name); };
+      btn.appendChild(del);
+      list.appendChild(btn);
+    });
+  });
+}
+function deleteWaypoint(name){
+  if(!confirm('Xoa waypoint: '+name+'?')) return;
+  apiCall('/waypoint/delete?name='+encodeURIComponent(name)).then(()=>loadWaypoints());
+}
+function saveCurrentAsWP(){
+  const name=document.getElementById('wp-name').value.trim();
+  if(!name)return alert('Nhap ten diem!');
+  const x=pos.x, y=pos.y;
+  apiCall('/waypoint/save?name='+encodeURIComponent(name)+'&x='+x+'&y='+y).then(()=>loadWaypoints());
+  document.getElementById('wp-name').value='';
+}
+async function startAI(){ 
+  await apiCall('/ai/start');
+  document.getElementById('ai-status').textContent='AI đang chạy';
+  document.getElementById('ai-status').style.color='#22c55e';
+  // Doi sang detection/compressed co bbox
+  if(window.aiRawSub){ window.aiRawSub.unsubscribe(); window.aiRawSub=null; }
+  if(!window.aiDetectionSub){
+    window.aiDetectionSub = new ROSLIB.Topic({ros, name:'/detection/compressed', messageType:'sensor_msgs/CompressedImage', throttle_rate:200});
+    window.aiDetectionSub.subscribe(msg=>{
+      const img = document.getElementById('ai-cam-img');
+      img.src = 'data:image/jpeg;base64,' + msg.data;
+      img.style.display = 'block';
+      document.getElementById('ai-cam-ph').style.display = 'none';
+    });
+  }
+}
+async function stopAI(){ 
+  await apiCall('/ai/stop'); 
+  stopTrack();
+  document.getElementById('ai-status').textContent='';
+  if(window.aiDetectionSub){ window.aiDetectionSub.unsubscribe(); window.aiDetectionSub=null; }
+  // Quay lai camera thuong
+  window.aiRawSub = new ROSLIB.Topic({ros, name:'/image_raw/compressed', messageType:'sensor_msgs/CompressedImage', throttle_rate:200});
+  window.aiRawSub.subscribe(msg=>{
+    const img = document.getElementById('ai-cam-img');
+    img.src = 'data:image/jpeg;base64,' + msg.data;
+    img.style.display = 'block';
+    document.getElementById('ai-cam-ph').style.display = 'none';
+  });
+  document.getElementById('ai-objects').textContent='Chua co...';
+}
+function switchPage(name){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active')); document.getElementById('page-'+name).classList.add('active'); document.getElementById('tab-'+name).classList.add('active'); }
+
+renderHistory();
+connect();
+
+// ===== BACKEND CONTROL =====
+const API = window.location.origin;
+
+async function apiCall(endpoint) {
+  try {
+    const r = await fetch(API + endpoint);
+    const data = await r.json();
+    if (data.msg) showToast(data.msg, data.ok);
+    return data;
+  } catch(e) {
+    showToast('Lỗi kết nối backend!', false);
+  }
+}
+
+async function startSlam() {
+  showToast('Đang khởi động SLAM...', true);
+  await apiCall('/slam/start');
+  setTimeout(checkStatus, 3000);
+}
+async function stopSlam() { await apiCall('/slam/stop'); checkStatus(); const c=document.getElementById('map-canvas'); if(c){const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);} const c2=document.getElementById('map-canvas2'); if(c2){const ctx2=c2.getContext('2d');ctx2.clearRect(0,0,c2.width,c2.height);} mapData=null; }
+async function startNav2() {
+  const c2=document.getElementById('map-canvas2');
+  if(c2){const ctx=c2.getContext('2d');ctx.clearRect(0,0,c2.width,c2.height);}
+  nav2Running=false;
+  showToast('Đang khởi động Nav2 (chờ ~30s)...', true);
+  await apiCall('/nav2/start');
+  setTimeout(()=>{
+    nav2Running=true;
+    mapData=null;
+    showToast('Nav2 sẵn sàng!', true);
+    loadWaypoints();
+    // Request map tu map_server
+    const mapReq = new ROSLIB.Topic({ros,name:'/map',messageType:'nav_msgs/OccupancyGrid'});
+    mapReq.subscribe(msg=>{
+      drawMap('map-canvas2',msg);
+      mapReq.unsubscribe();
+    });
+  }, 30000);
+  setTimeout(checkStatus, 5000);
+}
+async function stopNav2() { 
+  await apiCall('/nav2/stop'); 
+  checkStatus(); 
+  nav2Running=false;
+  const c2=document.getElementById('map-canvas2');
+  if(c2){const ctx=c2.getContext('2d');ctx.clearRect(0,0,c2.width,c2.height);}
+}
+
+async function checkStatus() {
+  try {
+    const r = await fetch(API + '/status');
+    const s = await r.json();
+    const ind = document.getElementById('mode-indicator');
+    const txt = document.getElementById('mode-status');
+    if (s.slam) {
+      ind.style.background = '#22c55e';
+      txt.textContent = 'SLAM đang chạy';
+      txt.style.color = '#22c55e';
+      nav2Running=false;
+    } else if (s.nav2) {
+      ind.style.background = '#38bdf8';
+      txt.textContent = 'Nav2 đang chạy';
+      txt.style.color = '#38bdf8';
+      if(!nav2Running){ nav2Running=true; loadWaypoints(); if(mapData) drawMap('map-canvas2',mapData); }
+    } else {
+      ind.style.background = '#ef4444';
+      txt.textContent = 'Chờ...';
+      txt.style.color = '#94a3b8';
+    }
+  } catch(e) {}
+}
+
+function showToast(msg, ok) {
+  let t = document.getElementById('toast');
+
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;top:70px;right:12px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;transition:opacity 0.3s;max-width:280px';
+    document.body.appendChild(t);
+  }
+
+  t.style.background = ok ? '#14532d' : '#450a0a';
+  t.style.color = ok ? '#4ade80' : '#f87171';
+  t.textContent = msg;
+  t.style.opacity = '1';
+
+  setTimeout(() => {
+    t.style.opacity = '0';
+  }, 3000);
+}
+
+setInterval(checkStatus, 5000);
+
+var estopPub = null;
+function initEStop(){
+  estopPub = new ROSLIB.Topic({ros, name:'/estop', messageType:'std_msgs/Bool'});
+}
+function eStop(){
+  document.querySelectorAll('.wp-btn').forEach(b=>b.classList.remove('active'));
+  if(tripStart) saveTrip('Dung khan cap', false);
+  if(estopPub) estopPub.publish(new ROSLIB.Message({data:true}));
+}
+
+function cancelNav(){
+  document.querySelectorAll('.wp-btn').forEach(b=>b.classList.remove('active'));
+  showToast('Da huy chon diem!', true);
+}
+
+
+
+
+async function updateSysInfo(){
+  const now = new Date();
+  document.getElementById('sys-time').textContent = now.toLocaleTimeString('vi-VN');
+  document.getElementById('sys-date').textContent = now.toLocaleDateString('vi-VN');
+  try {
+    const r = await fetch(API + '/sysinfo');
+    const d = await r.json();
+    document.getElementById('sys-cpu').textContent = d.cpu + '%';
+    document.getElementById('sys-ram').textContent = d.ram + '%';
+    document.getElementById('sys-disk').textContent = d.disk + 'GB';
+    document.getElementById('sys-wifi').textContent = d.wifi + ' dBm';
+  } catch(e) {}
+}
+setInterval(updateSysInfo, 5000);
+updateSysInfo();
+checkStatus();
+
+</script>
+<div class="page" id="page-ai">
+  <div style="padding:10px">
+    <span id='ai-status' style='font-size:13px;font-weight:600;margin-right:12px;'></span>
+    <button onclick="startAI()" style="background:#22c55e;color:white;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-right:8px">▶ Bắt đầu AI</button>
+    <button onclick="stopAI()" style="background:#ef4444;color:white;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">■ Dừng AI</button>
+  </div>
+  <div class="grid">
+    <div class="card full">
+      <h3>Nhan dien vat the</h3>
+      <div id="ai-cam-wrap" style="width:100%;background:#0f172a;border-radius:8px;overflow:hidden;position:relative;">
+        <img id="ai-cam-img" alt="AI Camera" style="width:100%;display:none;"/>
+        <span id="ai-cam-ph" style="color:#475569;font-size:13px;display:block;padding:20px;text-align:center">Chua co tin hieu...</span>
+      </div>
+    </div>
+    <div class="card full">
+      <h3>Vat the phat hien <span id="track-status" style="font-size:11px;color:#38bdf8;"></span></h3>
+      <button onclick="stopTrack()" style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;margin-bottom:8px">⛔ Dung track</button>
+      <div id="ai-objects" style="min-height:60px;font-size:13px;color:#e2e8f0;">Chua co...</div>
+      <p style="color:#475569;font-size:12px;margin-top:8px">💡 Bam vao ten vat the de bat dau track</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
