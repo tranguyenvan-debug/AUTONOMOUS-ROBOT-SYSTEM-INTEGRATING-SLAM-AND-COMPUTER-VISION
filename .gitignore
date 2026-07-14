@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# PlatformIO (ESP32)
+.pio/
+.clang_complete
+.gcc-flags.json
+
+# ROS 2 Build files
+install/
+log/
+build/
