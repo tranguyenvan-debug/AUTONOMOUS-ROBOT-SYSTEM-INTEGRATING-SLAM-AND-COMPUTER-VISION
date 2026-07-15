@@ -29,33 +29,25 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 - 👁️ **Computer Vision** — Object detection and visual servoing (YOLOv8n)
 - 🌐 **Web Dashboard** — Browser-based monitoring and control via WiFi
 
-
 <img width="605" height="569" alt="Prototyte" src="https://github.com/user-attachments/assets/e0b8a811-649b-4cf4-af38-e4673f278caa" />
-
 
 <img width="933" height="486" alt="3D" src="https://github.com/user-attachments/assets/5b12f464-9249-414d-8fbd-c4f9ccc0e5c2" />
 
-
 <img width="1171" height="833" alt="2D" src="https://github.com/user-attachments/assets/d18c11e4-847e-48fb-aa8c-9c7c69445421" />
-
 
 <img width="1920" height="1080" alt="Web" src="https://github.com/user-attachments/assets/ab3bbaa0-6b3b-408a-b5b0-383637f9fa13" />
 
-
 <img width="755" height="462" alt="TFtree" src="https://github.com/user-attachments/assets/0c825695-3ddb-41ee-be2d-8b3669908119" />
-
 
 <img width="541" height="434" alt="Tele" src="https://github.com/user-attachments/assets/38c19985-cf3e-41d8-a213-4d04c0723c69" />
 
-
 <img width="702" height="452" alt="Schematic" src="https://github.com/user-attachments/assets/4451c078-024a-4fab-9ffb-ed7f09ebe497" />
-
 
 <img width="895" height="459" alt="Map" src="https://github.com/user-attachments/assets/e6f231e1-86a9-4d85-b6fd-7d0afc5cffc8" />
 
-
 <img width="949" height="474" alt="Map_Web" src="https://github.com/user-attachments/assets/cbf60f6a-3951-4783-aaa8-313df5844808" />
 
+<img width="946" height="476" alt="AI" src="https://github.com/user-attachments/assets/83aa60fe-5a1a-4ac9-8b88-86d40577e2a4" />
 
 ---
 
@@ -66,26 +58,18 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 | Component | Image |
 |:---:|:---:|
 | Raspberry Pi 4 (4GB) | <img width="347" height="140" alt="Pi4" src="https://github.com/user-attachments/assets/d055b5a8-1d69-4016-96da-587528e2a09f" /> |
-
 | ESP32 DevKit v1 | <img width="468" height="390" alt="ESP32" src="https://github.com/user-attachments/assets/1173f4fb-7416-4cbf-8043-b4af2dec52f4" /> |
-
 | RPLidar A1M8 | <img width="354" height="321" alt="LiDAR A1M8" src="https://github.com/user-attachments/assets/67feba15-5b33-463b-8d71-8b7a3261612a" /> |
-
 | Raspberry Pi Camera V2 | <img width="752" height="529" alt="Camera Pi V2" src="https://github.com/user-attachments/assets/654740eb-7037-4fbb-8573-f999b1400b83" /> |
-
 | MPU6050 IMU | <img width="225" height="215" alt="IMU" src="https://github.com/user-attachments/assets/11fec748-a983-4586-9f71-ad1ae6c5c804" /> |
-
 | JGB37-520 Motor w/ Encoder | <img width="690" height="440" alt="JGB37-520-Encoder" src="https://github.com/user-attachments/assets/cf3237a0-75e7-4ebc-a099-be947963e56c" /> |
-
 | L298N Motor Driver | <img width="119" height="106" alt="Drive L298N" src="https://github.com/user-attachments/assets/df494df9-f181-40cb-83b8-d82d4d10aaa2" /> |
-
 | Buck DC-DC | <img width="185" height="164" alt="Buck DC" src="https://github.com/user-attachments/assets/40be79af-abca-4f48-a4d1-25b68885eb07" /> |
-
 | BMS | <img width="193" height="166" alt="BMS" src="https://github.com/user-attachments/assets/190f43a9-526f-4460-b469-d42007c50e96" /> |
-
 | 12V Power (3S 18650) | <img width="270" height="259" alt="18650" src="https://github.com/user-attachments/assets/05c40644-c15f-4fef-9e0a-37f4acbe6722" /> |
 
 </div>
+
 
 ---
 
@@ -102,7 +86,7 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 | IMU | MPU6050 | Acceleration & angular velocity |
 | Motors | JGB37-520 12V w/ Encoder | Differential drive |
 | Motor Driver | L298N H-Bridge | DC motor control |
-| Power | 12V LiPo Battery | Main power supply |
+| Power | 12V 18650 Battery | Main power supply |
 
 </div>
 
@@ -489,14 +473,10 @@ MIT License — Free to use for educational and research purposes.
 
 If this project helped you or inspired your own robot build, please consider giving it a **star** ⭐ on GitHub — it means a lot and helps others discover this project!
 
-[![GitHub stars](https://img.shields.io/github/stars/nguyenvantra-debug/autonomous-robot-slam?style=social)](https://github.com/nguyenvantra-debug/autonomous-robot-slam/stargazers)
-
----
-
 <div align="center">
 
 **Made with ❤️ by [nguyenvantra-debug](https://github.com/nguyenvantra-debug) (Văn Trà)**
 
-*Ho Chi Minh City University of Technology (HCMUT) | Faculty of Electrical & Electronics Engineering | 2026*
+*Ho Chi Minh City University of Technology (HCMUT) | Bachelor of Engineering in Electronics and Telecommunications | 2026*
 
 </div>
