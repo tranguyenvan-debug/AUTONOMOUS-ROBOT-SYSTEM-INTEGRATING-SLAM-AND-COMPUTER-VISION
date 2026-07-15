@@ -1,16 +1,16 @@
 # 🤖 Autonomous Robot System Integrating SLAM and Computer Vision
 
-**Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT)
+> **Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT), Faculty of Electrical & Electronics Engineering
+> **Student:** Nguyen Van Tra — ID: 2112472
+> **Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
+> **Year:** 2026
 
-Bachelor of Engineering in Electronics and Telecommunications
+[![ROS2](https://img.shields.io/badge/ROS2-Jazzy-blue)](https://docs.ros.org/en/jazzy/)
+[![Python](https://img.shields.io/badge/Python-3.12-green)](https://www.python.org/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-nano-yellow)](https://docs.ultralytics.com/)
+[![License](https://img.shields.io/badge/License-MIT-red)](LICENSE)
 
-**Student:** Nguyen Van Tra
-
-**Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
-
-**Year:** 2026
-
-**Achievement:** 9/10
+---
 
 ## 📋 Overview
 
@@ -28,24 +28,30 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 
 > 📸 **Add your hardware photos here** — upload images to the `docs/images/` folder and link them below.
 
-| Component | Image | Purchase Link |
-|---|---|---|
-| Raspberry Pi 4 (4GB) | *(add photo)* | [Official Store](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) |
-| ESP32 DevKit v1 | *(add photo)* | [Shopee](https://shopee.vn) / [Amazon](https://amazon.com) |
-| RPLidar A1M8 | *(add photo)* | [SLAMTEC Store](https://www.slamtec.com/en/Lidar/A1) |
-| Raspberry Pi Camera V2 | *(add photo)* | [Official Store](https://www.raspberrypi.com/products/camera-module-v2/) |
-| MPU6050 IMU | *(add photo)* | [Shopee](https://shopee.vn) |
-| JGB37-520 Motor w/ Encoder | *(add photo)* | [Shopee](https://shopee.vn) |
-| L298N Motor Driver | *(add photo)* | [Shopee](https://shopee.vn) |
+<div align="center">
 
-> 💡 **Tip:** Replace `*(add photo)*` with `![name](docs/images/filename.jpg)` after uploading your photos.
+| Component | Image |
+|:---:|:---:|
+| Raspberry Pi 4 (4GB) | *(add photo)* |
+| ESP32 DevKit v1 | *(add photo)* |
+| RPLidar A1M8 | *(add photo)* |
+| Raspberry Pi Camera V2 | *(add photo)* |
+| MPU6050 IMU | *(add photo)* |
+| JGB37-520 Motor w/ Encoder | *(add photo)* |
+| L298N Motor Driver | *(add photo)* |
+
+</div>
+
+> 💡 Replace `*(add photo)*` with `![name](docs/images/filename.jpg)` after uploading your photos.
 
 ---
 
 ## 🔧 Hardware Components
 
+<div align="center">
+
 | Component | Model | Role |
-|---|---|---|
+|:---:|:---:|:---:|
 | Embedded Computer | Raspberry Pi 4 (4GB RAM) | ROS2, SLAM, Nav2, AI processing |
 | Microcontroller | ESP32 DevKit v1 | PID motor control, Odometry |
 | LiDAR | RPLidar A1M8 | 360° environment scanning, 12m range |
@@ -55,14 +61,18 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 | Motor Driver | L298N H-Bridge | DC motor control |
 | Power | 12V LiPo Battery | Main power supply |
 
+</div>
+
 ---
 
 ## 🔌 Pin Wiring Table
 
 ### ESP32 → L298N (Motor Driver)
 
+<div align="center">
+
 | ESP32 Pin | L298N Pin | Description |
-|---|---|---|
+|:---:|:---:|:---:|
 | GPIO 25 | IN1 | Left motor direction A |
 | GPIO 26 | IN2 | Left motor direction B |
 | GPIO 27 | IN3 | Right motor direction A |
@@ -71,10 +81,14 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 | GPIO 33 | ENB (PWM) | Right motor speed |
 | GND | GND | Common ground |
 
+</div>
+
 ### ESP32 → Encoder (JGB37-520)
 
+<div align="center">
+
 | ESP32 Pin | Encoder Pin | Description |
-|---|---|---|
+|:---:|:---:|:---:|
 | GPIO 18 | Left Encoder A | Left wheel channel A |
 | GPIO 19 | Left Encoder B | Left wheel channel B |
 | GPIO 22 | Right Encoder A | Right wheel channel A |
@@ -82,30 +96,42 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 | 3.3V | VCC | Encoder power |
 | GND | GND | Common ground |
 
+</div>
+
 ### Raspberry Pi 4 → MPU6050 (I2C)
 
+<div align="center">
+
 | Raspberry Pi Pin | MPU6050 Pin | Description |
-|---|---|---|
+|:---:|:---:|:---:|
 | Pin 1 (3.3V) | VCC | Power supply |
 | Pin 6 (GND) | GND | Ground |
 | Pin 3 (GPIO 2, SDA) | SDA | I2C data |
 | Pin 5 (GPIO 3, SCL) | SCL | I2C clock |
 | — | AD0 | Left floating → address 0x68 |
 
+</div>
+
 ### Raspberry Pi 4 → Other Peripherals
 
+<div align="center">
+
 | Raspberry Pi | Device | Interface |
-|---|---|---|
+|:---:|:---:|:---:|
 | USB Port 1 | ESP32 | USB Serial (/dev/ttyESP32) |
 | USB Port 2 | RPLidar A1M8 | USB Serial (/dev/ttyLIDAR) |
 | CSI Camera Port | Pi Camera V2 | CSI Ribbon Cable |
+
+</div>
 
 ---
 
 ## 💻 Software Stack
 
+<div align="center">
+
 | Component | Technology |
-|---|---|
+|:---:|:---:|
 | OS | Ubuntu 24.04 (Raspberry Pi) |
 | Framework | ROS2 Jazzy |
 | SLAM | SLAM Toolbox (Graph-based SLAM) |
@@ -116,6 +142,8 @@ An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
 | Web Frontend | HTML/JavaScript + roslibjs |
 | Web Backend | Python HTTP Server |
 | Notification | Telegram Bot API |
+
+</div>
 
 ---
 
@@ -279,17 +307,23 @@ http://<raspberry_pi_ip>:8080
 
 ## 🌐 Web Dashboard
 
+<div align="center">
+
 | Tab | Features |
-|---|---|
+|:---:|:---:|
 | **Mapping** | Real-time SLAM map, joystick control, emergency stop, save map |
 | **Navigation** | Autonomous waypoint navigation, robot position on map, camera feed |
 | **AI** | Live camera, YOLOv8n detection overlay, visual servoing target selection |
 | **History** | Trip log, obstacle count, distance traveled, system stats |
 
+</div>
+
 ### Backend API Endpoints
 
+<div align="center">
+
 | Endpoint | Description |
-|---|---|
+|:---:|:---:|
 | `GET /slam/start` | Start SLAM mapping |
 | `GET /slam/stop` | Stop SLAM |
 | `GET /nav2/start` | Start Nav2 (loads latest map) |
@@ -304,14 +338,18 @@ http://<raspberry_pi_ip>:8080
 | `GET /sysinfo` | CPU / RAM / Disk / WiFi stats |
 | `GET /status` | SLAM / Nav2 running status |
 
+</div>
+
 ---
 
 ## 📊 Technical Specifications
 
 ### AI Model — YOLOv8n
 
+<div align="center">
+
 | Parameter | Value |
-|---|---|
+|:---:|:---:|
 | Model | YOLOv8n (Nano) |
 | Format | ONNX Runtime |
 | Number of classes | 80 (COCO dataset) |
@@ -322,10 +360,14 @@ http://<raspberry_pi_ip>:8080
 | Confidence threshold | 0.4 |
 | IoU threshold (NMS) | 0.45 |
 
+</div>
+
 ### Navigation — Nav2
 
+<div align="center">
+
 | Parameter | Value |
-|---|---|
+|:---:|:---:|
 | Global Planner | NavFn (A*) |
 | Local Planner | MPPI Controller |
 | Robot radius | 0.15 m |
@@ -334,14 +376,20 @@ http://<raspberry_pi_ip>:8080
 | Goal tolerance | 0.5 m |
 | Map resolution | 0.02 m/pixel |
 
+</div>
+
 ### LiDAR — RPLidar A1M8
 
+<div align="center">
+
 | Parameter | Value |
-|---|---|
+|:---:|:---:|
 | Range | 0.15 — 12 m |
 | Scan frequency | ~5.5 Hz (360°/revolution) |
 | Points per scan | ~1,450 points |
 | Interface | USB Serial |
+
+</div>
 
 ---
 
