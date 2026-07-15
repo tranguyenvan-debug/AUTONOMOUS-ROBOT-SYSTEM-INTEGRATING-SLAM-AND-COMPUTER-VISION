@@ -222,7 +222,7 @@ robot_project/
 ### Option 2 — Clone via Git
 
 ```bash
-git clone [AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION](https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION)
+git clone https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION
 cd AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION-1.0.0
 ```
 
@@ -266,7 +266,7 @@ pip install onnxruntime opencv-python smbus2 pyserial --break-system-packages
 ```bash
 mkdir -p ~/robot_ws/src
 cd ~/robot_ws/src
-git clone https://github.com/nguyenvantra-debug/autonomous-robot-slam.git
+git clone https://https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION
 cd ~/robot_ws
 colcon build --packages-select robot_base
 source install/setup.bash
