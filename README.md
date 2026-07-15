@@ -1,10 +1,16 @@
 # 🤖 Autonomous Robot System Integrating SLAM and Computer Vision
 
-> **Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT), Faculty of Electrical & Electronics Engineering
-> **Student:** Nguyen Van Tra — ID: 2112472
-> **Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
-> **Year:** 2026
+**Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT)
 
+Bachelor of Engineering in Electronics and Telecommunications
+
+**Student:** Nguyen Van Tra
+
+**Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
+
+**Year:** 2026
+
+**Achievement:** 9/10
 [![ROS2](https://img.shields.io/badge/ROS2-Jazzy-blue)](https://docs.ros.org/en/jazzy/)
 [![Python](https://img.shields.io/badge/Python-3.12-green)](https://www.python.org/)
 [![YOLOv8](https://img.shields.io/badge/YOLOv8-nano-yellow)](https://docs.ultralytics.com/)
@@ -239,7 +245,7 @@ pip install onnxruntime opencv-python smbus2 pyserial --break-system-packages
 ```bash
 mkdir -p ~/robot_ws/src
 cd ~/robot_ws/src
-git clone https://github.com/nguyenvantra-debug/autonomous-robot-slam.git robot_base
+git clone https://github.com/nguyenvantra-debug/autonomous-robot-slam.git
 cd ~/robot_ws
 colcon build --packages-select robot_base
 source install/setup.bash
