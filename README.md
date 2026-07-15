@@ -222,7 +222,7 @@ robot_project/
 ### Option 2 — Clone via Git
 
 ```bash
-git clone https://github.com/nguyenvantra-debug/autonomous-robot-slam.git
+git clone https://[github.com/nguyenvantra-debug/autonomous-robot-slam.git](https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION)
 cd autonomous-robot-slam
 ```
 
