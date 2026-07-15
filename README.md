@@ -1,10 +1,11 @@
 # 🤖 Autonomous Robot System Integrating SLAM and Computer Vision
 
-> **Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT), Bachelor of Engineering in Electronics and Telecommunications
-> **Student:** Nguyen Van Tra
-> **Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
-> **Year:** 2026
-> **Achievement:** 9/10
+**Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT)
+Bachelor of Engineering in Electronics and Telecommunications
+**Student:** Nguyen Van Tra
+**Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
+**Year:** 2026
+**Achievement:** 9/10
 
 ## 📋 Overview
 
