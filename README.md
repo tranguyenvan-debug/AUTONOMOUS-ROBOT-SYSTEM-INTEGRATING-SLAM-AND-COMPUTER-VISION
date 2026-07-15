@@ -266,7 +266,7 @@ pip install onnxruntime opencv-python smbus2 pyserial --break-system-packages
 ```bash
 mkdir -p ~/robot_ws/src
 cd ~/robot_ws/src
-git clone https://https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION
+git clone https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION
 cd ~/robot_ws
 colcon build --packages-select robot_base
 source install/setup.bash
