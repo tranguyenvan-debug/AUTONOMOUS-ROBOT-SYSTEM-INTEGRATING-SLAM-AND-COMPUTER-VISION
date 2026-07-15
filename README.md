@@ -216,14 +216,14 @@ robot_project/
 ### Option 1 — Download from GitHub Releases (Recommended)
 
 1. Go to the [**Releases**](../../releases) tab on GitHub
-2. Download the latest `.zip` file (e.g. `robot-slam-v1.0.zip`)
+2. Download the latest `.zip` file (e.g. `AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION-1.0.0.zip`)
 3. Extract and follow the installation steps below
 
 ### Option 2 — Clone via Git
 
 ```bash
-git clone https://[github.com/nguyenvantra-debug/autonomous-robot-slam.git](https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION)
-cd autonomous-robot-slam
+git clone [AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION](https://github.com/tranguyenvan-debug/AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION)
+cd AUTONOMOUS-ROBOT-SYSTEM-INTEGRATING-SLAM-AND-COMPUTER-VISION-1.0.0
 ```
 
 ### Option 3 — Download ZIP directly
