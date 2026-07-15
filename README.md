@@ -1,41 +1,104 @@
-# 🤖 Hệ Thống Robot Tự Hành Tích Hợp SLAM và Thị Giác Máy Tính
+# 🤖 Autonomous Robot System Integrating SLAM and Computer Vision
 
-> **Đồ Án 2** — Trường Đại học Bách Khoa TP.HCM, Khoa Điện - Điện Tử  
-> **Sinh viên:** Nguyễn Văn Trà — MSSV: 2112472  
-> **GVHD:** PGS. TS. Hà Hoàng Kha  
-> **Năm:** 2026
+> **Final Year Project (Đồ Án 2)** — Ho Chi Minh City University of Technology (HCMUT), Bachelor of Engineering in Electronics and Telecommunications
+> **Student:** Nguyen Van Tra
+> **Supervisor:** Assoc. Prof. Dr. Ha Hoang Kha
+> **Year:** 2026
+> **Achievement:** 9/10
+
+## 📋 Overview
+
+An indoor autonomous mobile robot system built on **ROS2 Jazzy**, integrating:
+
+- 🗺️ **SLAM** — Real-time 360° environment mapping via LiDAR
+- 📍 **Localization** — Robot positioning on saved maps (AMCL)
+- 🚗 **Navigation** — Autonomous waypoint navigation with obstacle avoidance (Nav2)
+- 👁️ **Computer Vision** — Object detection and visual servoing (YOLOv8n)
+- 🌐 **Web Dashboard** — Browser-based monitoring and control via WiFi
 
 ---
 
-## 📋 Giới thiệu
+## 🖼️ Hardware Gallery
 
-Hệ thống robot di động tự hành phục vụ môi trường trong nhà, xây dựng trên nền tảng **ROS2 Jazzy**. Tích hợp hoàn chỉnh các chức năng:
+> 📸 **Add your hardware photos here** — upload images to the `docs/images/` folder and link them below.
 
-- 🗺️ **SLAM** — Tự động lập bản đồ môi trường 360° bằng LiDAR
-- 📍 **Localization** — Định vị robot trên bản đồ đã lưu (AMCL)
-- 🚗 **Navigation** — Tự hành đến waypoint, tránh vật cản (Nav2)
-- 👁️ **Computer Vision** — Nhận diện và bám theo vật thể (YOLOv8n)
-- 🌐 **Web Dashboard** — Điều khiển và giám sát qua trình duyệt
-
----
-
-## 🔧 Phần cứng
-
-| Thành phần | Model | Vai trò |
+| Component | Image | Purchase Link |
 |---|---|---|
-| Máy tính nhúng | Raspberry Pi 4 (4GB RAM) | Xử lý ROS2, SLAM, Nav2, AI |
-| Vi điều khiển | ESP32 | Điều khiển động cơ PID, Odometry |
-| LiDAR | RPLidar A1M8 | Quét môi trường 360°, 12m |
-| Camera | Raspberry Pi Camera V2 | Stream video, nhận diện vật thể |
-| IMU | MPU6050 | Đo gia tốc và vận tốc góc |
-| Động cơ | JGB37-520 12V Encoder | Truyền động vi sai |
-| Driver | L298N H-Bridge | Điều khiển động cơ DC |
+| Raspberry Pi 4 (4GB) | *(add photo)* | [Official Store](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) |
+| ESP32 DevKit v1 | *(add photo)* | [Shopee](https://shopee.vn) / [Amazon](https://amazon.com) |
+| RPLidar A1M8 | *(add photo)* | [SLAMTEC Store](https://www.slamtec.com/en/Lidar/A1) |
+| Raspberry Pi Camera V2 | *(add photo)* | [Official Store](https://www.raspberrypi.com/products/camera-module-v2/) |
+| MPU6050 IMU | *(add photo)* | [Shopee](https://shopee.vn) |
+| JGB37-520 Motor w/ Encoder | *(add photo)* | [Shopee](https://shopee.vn) |
+| L298N Motor Driver | *(add photo)* | [Shopee](https://shopee.vn) |
+
+> 💡 **Tip:** Replace `*(add photo)*` with `![name](docs/images/filename.jpg)` after uploading your photos.
 
 ---
 
-## 💻 Phần mềm
+## 🔧 Hardware Components
 
-| Thành phần | Công nghệ |
+| Component | Model | Role |
+|---|---|---|
+| Embedded Computer | Raspberry Pi 4 (4GB RAM) | ROS2, SLAM, Nav2, AI processing |
+| Microcontroller | ESP32 DevKit v1 | PID motor control, Odometry |
+| LiDAR | RPLidar A1M8 | 360° environment scanning, 12m range |
+| Camera | Raspberry Pi Camera V2 | Video stream, object detection |
+| IMU | MPU6050 | Acceleration & angular velocity |
+| Motors | JGB37-520 12V w/ Encoder | Differential drive |
+| Motor Driver | L298N H-Bridge | DC motor control |
+| Power | 12V LiPo Battery | Main power supply |
+
+---
+
+## 🔌 Pin Wiring Table
+
+### ESP32 → L298N (Motor Driver)
+
+| ESP32 Pin | L298N Pin | Description |
+|---|---|---|
+| GPIO 25 | IN1 | Left motor direction A |
+| GPIO 26 | IN2 | Left motor direction B |
+| GPIO 27 | IN3 | Right motor direction A |
+| GPIO 14 | IN4 | Right motor direction B |
+| GPIO 32 | ENA (PWM) | Left motor speed |
+| GPIO 33 | ENB (PWM) | Right motor speed |
+| GND | GND | Common ground |
+
+### ESP32 → Encoder (JGB37-520)
+
+| ESP32 Pin | Encoder Pin | Description |
+|---|---|---|
+| GPIO 18 | Left Encoder A | Left wheel channel A |
+| GPIO 19 | Left Encoder B | Left wheel channel B |
+| GPIO 22 | Right Encoder A | Right wheel channel A |
+| GPIO 23 | Right Encoder B | Right wheel channel B |
+| 3.3V | VCC | Encoder power |
+| GND | GND | Common ground |
+
+### Raspberry Pi 4 → MPU6050 (I2C)
+
+| Raspberry Pi Pin | MPU6050 Pin | Description |
+|---|---|---|
+| Pin 1 (3.3V) | VCC | Power supply |
+| Pin 6 (GND) | GND | Ground |
+| Pin 3 (GPIO 2, SDA) | SDA | I2C data |
+| Pin 5 (GPIO 3, SCL) | SCL | I2C clock |
+| — | AD0 | Left floating → address 0x68 |
+
+### Raspberry Pi 4 → Other Peripherals
+
+| Raspberry Pi | Device | Interface |
+|---|---|---|
+| USB Port 1 | ESP32 | USB Serial (/dev/ttyESP32) |
+| USB Port 2 | RPLidar A1M8 | USB Serial (/dev/ttyLIDAR) |
+| CSI Camera Port | Pi Camera V2 | CSI Ribbon Cable |
+
+---
+
+## 💻 Software Stack
+
+| Component | Technology |
 |---|---|
 | OS | Ubuntu 24.04 (Raspberry Pi) |
 | Framework | ROS2 Jazzy |
@@ -44,63 +107,86 @@ Hệ thống robot di động tự hành phục vụ môi trường trong nhà, 
 | Navigation | Nav2 Stack (MPPI + NavFn/A*) |
 | Sensor Fusion | EKF (robot_localization) |
 | AI Model | YOLOv8n ONNX (80 classes, COCO) |
-| Web | HTML/JavaScript + roslibjs |
-| Backend | Python HTTP Server |
+| Web Frontend | HTML/JavaScript + roslibjs |
+| Web Backend | Python HTTP Server |
+| Notification | Telegram Bot API |
 
 ---
 
-## 📁 Cấu trúc dự án
+## 📁 Project Structure
 
 ```
 robot_project/
 ├── robot_ws/src/robot_base/
 │   ├── robot_base/
-│   │   ├── serial_bridge.py        # Giao tiếp ESP32 qua Serial USB
-│   │   ├── imu_publisher.py        # Đọc IMU MPU6050 qua I2C
-│   │   ├── camera_publisher.py     # Stream camera Pi V2 (OpenCV)
-│   │   └── yolo_detector.py        # Nhận diện YOLOv8n + Visual Servoing
+│   │   ├── serial_bridge.py        # ESP32 communication via Serial USB
+│   │   ├── imu_publisher.py        # MPU6050 IMU reading via I2C
+│   │   ├── camera_publisher.py     # Pi Camera V2 stream (OpenCV)
+│   │   └── yolo_detector.py        # YOLOv8n detection + Visual Servoing
 │   ├── launch/
-│   │   ├── slam.launch.py          # Khởi động nodes cơ bản khi boot
+│   │   ├── slam.launch.py          # Boot: start base nodes
 │   │   ├── slam_only.launch.py     # SLAM Toolbox (mapping mode)
 │   │   └── nav2_only.launch.py     # Nav2 Stack (navigation mode)
 │   └── config/
-│       ├── ekf.yaml                # Cấu hình Extended Kalman Filter
-│       ├── slam.yaml               # Cấu hình SLAM Toolbox
-│       └── nav2_params.yaml        # Cấu hình Nav2 (AMCL, costmap, planner)
+│       ├── ekf.yaml                # Extended Kalman Filter config
+│       ├── slam.yaml               # SLAM Toolbox parameters
+│       └── nav2_params.yaml        # Nav2 config (AMCL, costmap, planner)
 ├── robot_web/
 │   ├── backend.py                  # HTTP server (port 8080)
 │   └── index.html                  # Web Dashboard
-├── maps/                           # Bản đồ đã lưu (.pgm, .yaml, waypoints.json)
+├── maps/                           # Saved maps (.pgm, .yaml, waypoints.json)
 ├── yolov8n.onnx                    # AI model (12.7MB)
-├── run_slam.sh                     # Script khởi động SLAM
-├── run_nav2.sh                     # Script khởi động Nav2
-├── send_ip.sh                      # Gửi IP qua Telegram khi boot
+├── run_slam.sh                     # SLAM startup script
+├── run_nav2.sh                     # Nav2 startup script
+├── send_ip.sh                      # Send IP via Telegram on boot
+├── docs/images/                    # Hardware photos (add yours here)
 └── /etc/
     ├── systemd/system/
-    │   ├── robot-ros.service       # Auto-start ROS2 khi boot
-    │   └── robot-web.service       # Auto-start Web Dashboard khi boot
+    │   ├── robot-ros.service       # Auto-start ROS2 on boot
+    │   └── robot-web.service       # Auto-start Web Dashboard on boot
     └── udev/rules.d/
-        └── 99-robot.rules          # Cố định port ESP32 và LiDAR
+        └── 99-robot.rules          # Fixed port symlinks for ESP32 & LiDAR
 ```
 
 ---
 
-## 🚀 Cài đặt
+## ⬇️ Download
 
-### Yêu cầu
+### Option 1 — Download from GitHub Releases (Recommended)
+
+1. Go to the [**Releases**](../../releases) tab on GitHub
+2. Download the latest `.zip` file (e.g. `robot-slam-v1.0.zip`)
+3. Extract and follow the installation steps below
+
+### Option 2 — Clone via Git
+
+```bash
+git clone https://github.com/nguyenvantra-debug/autonomous-robot-slam.git
+cd autonomous-robot-slam
+```
+
+### Option 3 — Download ZIP directly
+
+Click **Code → Download ZIP** at the top of this page.
+
+---
+
+## 🚀 Installation
+
+### Requirements
 
 - Raspberry Pi 4 (Ubuntu 24.04)
 - ROS2 Jazzy
 - Python 3.12+
 
-### 1. Cài đặt ROS2 Jazzy
+### 1. Install ROS2 Jazzy
 
 ```bash
-# Theo hướng dẫn chính thức
+# Follow official guide
 https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html
 ```
 
-### 2. Cài đặt dependencies
+### 2. Install dependencies
 
 ```bash
 sudo apt install -y \
@@ -114,25 +200,26 @@ sudo apt install -y \
 pip install onnxruntime opencv-python smbus2 pyserial --break-system-packages
 ```
 
-### 3. Clone và build
+### 3. Clone and build
 
 ```bash
 mkdir -p ~/robot_ws/src
 cd ~/robot_ws/src
-git clone <repo-url> robot_base
+git clone https://github.com/nguyenvantra-debug/autonomous-robot-slam.git robot_base
 cd ~/robot_ws
 colcon build --packages-select robot_base
 source install/setup.bash
 ```
 
-### 4. Cấu hình udev rules (cố định port)
+### 4. Setup udev rules (fixed serial ports)
 
 ```bash
 sudo cp etc/udev/rules.d/99-robot.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules && sudo udevadm trigger
+# Verify: ls -la /dev/ttyESP32 /dev/ttyLIDAR
 ```
 
-### 5. Cài đặt systemd services (auto-boot)
+### 5. Install systemd services (auto-boot)
 
 ```bash
 sudo cp etc/systemd/system/robot-ros.service /etc/systemd/system/
@@ -141,159 +228,149 @@ sudo systemctl enable robot-ros.service robot-web.service
 sudo systemctl start robot-ros.service robot-web.service
 ```
 
-### 6. Cấu hình Telegram Bot (nhận IP khi boot)
+### 6. Configure Telegram Bot (receive IP on boot)
 
-Chỉnh sửa `send_ip.sh`:
+Edit `send_ip.sh`:
 ```bash
-TOKEN="your_bot_token"
-CHAT_ID="your_chat_id"
+TOKEN="your_bot_token_here"
+CHAT_ID="your_chat_id_here"
 ```
+
+Get your token from [@BotFather](https://t.me/botfather) on Telegram.
 
 ---
 
-## 📖 Hướng dẫn sử dụng
+## 📖 Usage
 
-### Truy cập Web Dashboard
-
-```
-http://<IP_raspberry_pi>:8080
-```
-
-### Flow hoạt động
+### Access Web Dashboard
 
 ```
-1. Boot Pi → services tự khởi động → nhận IP qua Telegram
-2. Mở Web Dashboard trên browser
-3. Tab Mapping:
-   - Bấm "Bắt đầu SLAM"
-   - Lái robot vẽ bản đồ bằng joystick
-   - Bấm "Lưu Map" → đặt tên → "Dừng SLAM"
-4. Tab Navigation:
-   - Bấm "Bắt đầu Nav2" (đợi ~30s)
-   - Bấm "Set vị trí ban đầu"
-   - Lưu waypoint → Bấm waypoint để robot tự hành
-5. Tab AI:
-   - Bấm "Bắt đầu AI"
-   - Camera hiện nhận diện vật thể
-   - Bấm tên vật thể để robot bám theo
+http://<raspberry_pi_ip>:8080
+```
+
+> 💡 The robot sends its IP to your Telegram on every boot — no need to check manually.
+
+### Operating Flow
+
+```
+1. Power on Pi → services auto-start → receive IP via Telegram
+2. Open Web Dashboard in browser
+3. Tab [Mapping]:
+   - Click "Start SLAM"
+   - Drive robot around the room using joystick
+   - Click "Save Map" → enter name → "Stop SLAM"
+4. Tab [Navigation]:
+   - Click "Start Nav2" (wait ~30s for initialization)
+   - Click "Set Initial Pose" (place robot at starting position)
+   - Save waypoints → click any waypoint to start autonomous navigation
+5. Tab [AI]:
+   - Click "Start AI"
+   - Camera shows real-time object detection
+   - Click object name to activate visual servoing (robot follows target)
 ```
 
 ---
 
 ## 🌐 Web Dashboard
 
-| Tab | Chức năng |
+| Tab | Features |
 |---|---|
-| **Mapping** | Vẽ bản đồ SLAM realtime, joystick điều khiển, lưu map |
-| **Navigation** | Tự hành đến waypoint, hiển thị vị trí robot trên map |
-| **AI** | Camera realtime, nhận diện vật thể, visual servoing |
-| **Lịch sử** | Theo dõi các chuyến đi, thống kê hệ thống |
+| **Mapping** | Real-time SLAM map, joystick control, emergency stop, save map |
+| **Navigation** | Autonomous waypoint navigation, robot position on map, camera feed |
+| **AI** | Live camera, YOLOv8n detection overlay, visual servoing target selection |
+| **History** | Trip log, obstacle count, distance traveled, system stats |
 
 ### Backend API Endpoints
 
-| Endpoint | Chức năng |
+| Endpoint | Description |
 |---|---|
-| `GET /slam/start` | Khởi động SLAM |
-| `GET /slam/stop` | Dừng SLAM |
-| `GET /nav2/start` | Khởi động Nav2 (load map mới nhất) |
-| `GET /nav2/stop` | Dừng Nav2 |
-| `GET /map/save?name=X` | Lưu bản đồ |
-| `GET /waypoint/save` | Lưu waypoint |
-| `GET /waypoint/list` | Danh sách waypoints |
-| `GET /waypoint/delete` | Xóa waypoint |
-| `GET /ai/start` | Khởi động YOLO detector |
-| `GET /ai/stop` | Dừng YOLO detector |
-| `GET /set_initial_pose` | Set vị trí ban đầu cho AMCL |
-| `GET /sysinfo` | Thông tin CPU/RAM/Disk/WiFi |
-| `GET /status` | Trạng thái SLAM/Nav2 |
+| `GET /slam/start` | Start SLAM mapping |
+| `GET /slam/stop` | Stop SLAM |
+| `GET /nav2/start` | Start Nav2 (loads latest map) |
+| `GET /nav2/stop` | Stop Nav2 |
+| `GET /map/save?name=X` | Save current map |
+| `GET /waypoint/save` | Save current position as waypoint |
+| `GET /waypoint/list` | List all waypoints for current map |
+| `GET /waypoint/delete` | Delete a waypoint |
+| `GET /ai/start` | Start YOLO detector |
+| `GET /ai/stop` | Stop YOLO detector |
+| `GET /set_initial_pose` | Publish initial pose to AMCL |
+| `GET /sysinfo` | CPU / RAM / Disk / WiFi stats |
+| `GET /status` | SLAM / Nav2 running status |
 
 ---
 
-## 📊 Thông số kỹ thuật
+## 📊 Technical Specifications
 
 ### AI Model — YOLOv8n
 
-| Thông số | Giá trị |
+| Parameter | Value |
 |---|---|
 | Model | YOLOv8n (Nano) |
 | Format | ONNX Runtime |
-| Số class | 80 (COCO dataset) |
-| Kích thước model | 12.7 MB |
+| Number of classes | 80 (COCO dataset) |
+| Model size | 12.7 MB |
 | mAP50 (COCO) | 37.3% |
 | mAP50-95 (COCO) | 52.9% |
-| FPS trên Pi 4 | ~0.3-0.5 FPS |
+| FPS on Raspberry Pi 4 | ~0.3–0.5 FPS |
 | Confidence threshold | 0.4 |
 | IoU threshold (NMS) | 0.45 |
 
 ### Navigation — Nav2
 
-| Thông số | Giá trị |
+| Parameter | Value |
 |---|---|
 | Global Planner | NavFn (A*) |
 | Local Planner | MPPI Controller |
 | Robot radius | 0.15 m |
 | Inflation radius | 0.2 m |
-| Max velocity | 0.2 m/s |
+| Max linear velocity | 0.2 m/s |
 | Goal tolerance | 0.5 m |
 | Map resolution | 0.02 m/pixel |
 
 ### LiDAR — RPLidar A1M8
 
-| Thông số | Giá trị |
+| Parameter | Value |
 |---|---|
-| Tầm đo | 0.15 — 12 m |
-| Tốc độ quét | ~5.5 Hz (360°/vòng) |
-| Số điểm/vòng | ~1450 điểm |
-| Giao tiếp | Serial USB |
+| Range | 0.15 — 12 m |
+| Scan frequency | ~5.5 Hz (360°/revolution) |
+| Points per scan | ~1,450 points |
+| Interface | USB Serial |
 
 ---
 
-## 🔌 Kết nối phần cứng
-
-```
-Raspberry Pi 4
-├── USB → ESP32 (/dev/ttyESP32)
-├── USB → RPLidar A1M8 (/dev/ttyLIDAR)
-├── CSI → Pi Camera V2
-└── I2C (GPIO 2,3) → MPU6050
-
-ESP32
-├── GPIO → L298N (PWM motor control)
-├── GPIO → Encoder JGB37-520 (Left)
-└── GPIO → Encoder JGB37-520 (Right)
-```
-
----
-
-## 🐛 Debug
+## 🐛 Debugging
 
 ```bash
-# Kiểm tra nodes đang chạy
+# Check running nodes
 ros2 node list
 
-# Kiểm tra SLAM status
+# Check SLAM status
 ros2 lifecycle get /slam_toolbox
 
-# Kiểm tra AMCL pose
+# Check AMCL pose
 ros2 topic echo /amcl_pose --once
 
-# Kiểm tra LiDAR data
+# Check LiDAR data rate
 ros2 topic hz /scan
 
-# Kiểm tra logs
+# View service logs
 sudo journalctl -u robot-ros.service -f
 sudo journalctl -u robot-web.service -f
 
-# Restart services
+# Restart all services
 sudo systemctl restart robot-ros.service robot-web.service
 
-# Kill port conflict
+# Fix port conflict (rosbridge)
 sudo fuser -k 9090/tcp
+
+# Check CPU load
+top -bn1 | head -5
 ```
 
 ---
 
-## 📚 Tài liệu tham khảo
+## 📚 References
 
 - [ROS2 Jazzy Documentation](https://docs.ros.org/en/jazzy/)
 - [Nav2 Documentation](https://docs.nav2.org/)
@@ -301,13 +378,28 @@ sudo fuser -k 9090/tcp
 - [YOLOv8 — Ultralytics](https://docs.ultralytics.com/models/yolov8/)
 - [ONNX Runtime](https://onnxruntime.ai/docs/)
 - [Probabilistic Robotics — Thrun, Burgard, Fox](http://www.probabilistic-robotics.org/)
+- [Telegram Bot API](https://core.telegram.org/bots/api)
 
 ---
 
 ## 📄 License
 
-MIT License — Free to use for educational purposes.
+MIT License — Free to use for educational and research purposes.
 
 ---
 
-> **Trường Đại học Bách Khoa TP.HCM** | Khoa Điện - Điện Tử | 2026
+## ⭐ Support This Project
+
+If this project helped you or inspired your own robot build, please consider giving it a **star** ⭐ on GitHub — it means a lot and helps others discover this project!
+
+[![GitHub stars](https://img.shields.io/github/stars/nguyenvantra-debug/autonomous-robot-slam?style=social)](https://github.com/nguyenvantra-debug/autonomous-robot-slam/stargazers)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [nguyenvantra-debug](https://github.com/nguyenvantra-debug) (Văn Trà)**
+
+*Ho Chi Minh City University of Technology (HCMUT) | Faculty of Electrical & Electronics Engineering | 2026*
+
+</div>
